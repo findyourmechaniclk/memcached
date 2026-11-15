@@ -10,10 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Cache apt packages
+      uses: actions/cache@v4
+      with:
+        path: /home/runner/.cache/apt
+        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
     - name: Install deps
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y libevent-dev libseccomp-dev git libsasl2-dev libio-socket-ssl-perl
+        sudo apt-get install -y -o Dir::Cache::Archives=/home/runner/.cache/apt libevent-dev libseccomp-dev git libsasl2-dev libio-socket-ssl-perl
     - name: Build
       run: |
         gcc --version
